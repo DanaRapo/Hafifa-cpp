@@ -64,9 +64,9 @@ T BasicCalculator<T>::applyOp(std::vector<T>& values, char op)
 		{'/', [this](T& x, T& y) { return div(x, y); }}
 	};
 
-	auto it = opMap.find(op);
-	if (it != opMap.end()) {
-		T res = it->second(a, b);
+	auto operation = opMap.find(op);
+	if (operation != opMap.end()) {
+		T res = operation->second(a, b);
 		values.push_back(res);
 		return res;
 	} else {
