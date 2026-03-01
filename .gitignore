@@ -2,10 +2,24 @@
 *.d
 
 # Compiled Object files
-*.slo
+*.slo+
 *.lo
 *.o
 *.obj
+*.vcxproj
+*.vcxproj.*
+*.slnx
+CodeChunks.db
+CodeChunks.db-shm
+CodeChunks.db-wal
+SemanticSymbols.db
+SemanticSymbols.db-shm
+SemanticSymbols.db-wal
+
+
+
+
+
 
 # Precompiled Headers
 *.gch
