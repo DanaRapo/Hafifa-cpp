@@ -194,6 +194,19 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 	int index = 0;
 	bool expectNumber = true;
 
+	// precedence map
+	std::map<char, int> precedence = {
+		{'+', 1}, {'-', 1},
+		{'*', 2}, {'/', 2},
+		{'^', 3}, {'#', 3} // sqrt '#' treated as unary operator
+	};
+	// associativity map: true = right associative, false = left associative
+	std::map<char, bool> rightAssoc = {
+		{'+', false}, {'-', false},
+		{'*', false}, {'/', false},
+		{'^', true}, {'#', true} // right-associative
+	};
+
 	//loop on the expression until the end of it
 	while (true)
 	{
@@ -272,51 +285,29 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 
 			else if (isLegalOperaotor(op))
 			{
-				int currentPrecedence;
-				//checking the precedence of the current operator
-				if (op == '+' || op == '-') currentPrecedence = 1;
-				else if (op == '*' || op == '/') currentPrecedence = 2;
-				else if (op == '^' || op == '#') currentPrecedence = 3;
-				else currentPrecedence = 0; // should not happen due to isLegalOperator check
-
-				while (!operators.empty() &&
-					operators.back() != '(')
+				// pop from operator stack according to Shunting Yard rules
+				while (!operators.empty() && operators.back() != '(')
 				{
 					char topOp = operators.back();
-					int topPrecedence;
-					if (topOp == '+' || topOp == '-') topPrecedence = 1;
-					else if (topOp == '*' || topOp == '/') topPrecedence = 2;
-					else if (topOp == '^' || topOp == '#') topPrecedence = 3;
-					else topPrecedence = 0; // should not happen due to isLegalOperator check
+					int topPrecedence = precedence[topOp];
+					int currentPrecedence = precedence[op];
 
-					//handeling right associativity for power operator and sqrt operator
-					if (op == '^' || op == '#')
+					// check associativity
+					if (!rightAssoc[op] && topPrecedence >= currentPrecedence)
 					{
-						if (topPrecedence > currentPrecedence)
-						{
-							T calcVal = applyOp(values, topOp);
-							operators.pop_back();
-							if (calcVal == std::numeric_limits<T>::max())
-							{
-								return std::numeric_limits<T>::max();
-							}
-						}
-						else break;
+						T calcVal = applyOp(values, topOp);
+						operators.pop_back();
+						if (calcVal == std::numeric_limits<T>::max())
+							return std::numeric_limits<T>::max();
 					}
-					//another operators are left associative
-					else
+					else if (rightAssoc[op] && topPrecedence > currentPrecedence)
 					{
-						if (topPrecedence >= currentPrecedence)
-						{
-							T calcVal = applyOp(values, topOp);
-							operators.pop_back();
-							if (calcVal == std::numeric_limits<T>::max())
-							{
-								return std::numeric_limits<T>::max();
-							}
-						}
-						else break;
+						T calcVal = applyOp(values, topOp);
+						operators.pop_back();
+						if (calcVal == std::numeric_limits<T>::max())
+							return std::numeric_limits<T>::max();
 					}
+					else break;
 				}
 				operators.push_back(op);
 				index++;
