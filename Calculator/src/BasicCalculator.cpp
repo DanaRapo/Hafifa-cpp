@@ -126,6 +126,7 @@ T BasicCalculator<T>::solve(const std::string& expression)
     int index = 0;
     bool expectNumber = true;
 
+	//stops when reach the end of the expression
     while (true)
     {
         // Skip whitespace
