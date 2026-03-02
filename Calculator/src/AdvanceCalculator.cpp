@@ -12,12 +12,12 @@ template <class T>
 AdvanceCalculator<T>::~AdvanceCalculator() = default;
 
 template <class T>
-T AdvanceCalculator<T>::sqrtOp(T& a) {
+T AdvanceCalculator<T>::sqrtOp(T a) {
 	return static_cast<T>(std::sqrt(a));
 }
 
 template <class T>
-T AdvanceCalculator<T>::powOp(T& a, T& b) {
+T AdvanceCalculator<T>::powOp(T a, T b) {
 	return static_cast<T>(std::pow(a, b));
 }
 
@@ -45,12 +45,12 @@ T AdvanceCalculator<T>::applyOp(std::vector<T>& values, char op)
 	T b = values.back(); values.pop_back();
 	T a = values.back(); values.pop_back();
 
-	static std::map<char, std::function<T(T&, T&)>> opMap = {
-	{'+', [this](T& x, T& y) { return this->add(x, y); }},
-	{'-', [this](T& x, T& y) { return this->sub(x, y); }},
-	{'*', [this](T& x, T& y) { return this->mul(x, y); }},
-	{'^', [this](T& x, T& y) { return powOp(x, y); }},
-	{'/', [this](T& x, T& y) { return this->div(x, y); }}
+	static std::map<char, std::function<T(T, T)>> opMap = {
+	{'+', [this](T x, T y) { return this->add(x, y); }},
+	{'-', [this](T x, T y) { return this->sub(x, y); }},
+	{'*', [this](T x, T y) { return this->mul(x, y); }},
+	{'^', [this](T x, T y) { return powOp(x, y); }},
+	{'/', [this](T x, T y) { return this->div(x, y); }}
 	};
 
 	auto iterator = opMap.find(op);

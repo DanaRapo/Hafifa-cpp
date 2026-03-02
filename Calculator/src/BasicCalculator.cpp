@@ -57,7 +57,7 @@ T BasicCalculator<T>::applyOp(std::vector<T>& values, char op)
 	T b = values.back(); values.pop_back();
 	T a = values.back(); values.pop_back();
 
-	static std::map<char, std::function<T(T&, T&)>> opMap = {
+	static std::map<char, std::function<T(T, T)>> opMap = {
 		{'+', [this](T x, T y) { return add(x, y); }},
 		{'-', [this](T x, T y) { return sub(x, y); }},
 		{'*', [this](T x, T y) { return mul(x, y); }},

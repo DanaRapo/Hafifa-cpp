@@ -31,8 +31,8 @@ protected:
 	 * @return The result of applying the operator to the values
 	 */
 	T applyOp(std::vector<T>& values, char op) override;
-	T sqrtOp(T& a);
-	T powOp(T& a, T& b);
+	T sqrtOp(T a);
+	T powOp(T a, T b);
 	using BasicCalculator<T>::isLegalOperaotor;
 	using BasicCalculator<T>::addLegalOperator;
 };

@@ -3,24 +3,66 @@
 
 int main()
 {
-	BasicCalculator<int> calculator;
-	std::cout << "3+ 4 * 2 / (1 - 5) = " << calculator.solve("3 + 4 * 2 / (1 - 5)") <<"\n";
-	std::cout << "10 + 2 * 6 = " << calculator.solve("10 + 2 * 6") << "\n";
-	std::cout << "100 * (2 + 12) = " << calculator.solve("100 * (2 + 12)") << "\n";
-	std::cout << "100 * (2 + 12) = " << calculator.solve("100 * 2 + 12)") << "\n";
-	AdvanceCalculator<float> fcalculator;
-	AdvanceCalculator<std::complex<float>> comcalc;
-	std::cout << "sqrt(16) = " << fcalculator.solve("#16") << "\n";
-	std::cout << "2^3 = " << fcalculator.solve("2^3") << "\n";
-	std::cout << "100 * (2.5 + 12) = " << fcalculator.solve("100 * (2.5 + 12)") << "\n";
-	std::cout << "100 * (2 + 12) = " << calculator.solve("100 * (2 + 12") << "\n";
+	int choice;
+	BasicCalculator<int> realCalc;
+	AdvanceCalculator<float> fractuionCalc;
+	AdvanceCalculator<std::complex<float>> complexCalc;
+	while (true)
+	{
+		std::cout << "\nSelect calculator:\n";
+		std::cout << "1 - Regular calculator\n";
+		std::cout << "2 - Fraction calculator\n";
+		std::cout << "3 - Complex number calculator\n";
+		std::cout << "9 - Exit\n";
+		std::cout << "Choice: ";
+		std::cin >> choice;
+		std::cin.ignore();
 
-	std::cout << "2+3i + 4-5i = " << comcalc.solve("2+3i + 4-5i") << "\n";
-	std::cout << "sqrt(4-3i) = " << comcalc.solve("#(4-3i)") << "\n";
-	std::cout << "(1+2i)^(3-4i) = " << comcalc.solve("(1+2i)^(3-4i)") << "\n";
-	std::cout << "5+3i*8i= " << comcalc.solve("5+3i*8i") << "\n";
+		if (choice == 9) {
+			std::cout << "Exiting...\n";
+			break;
+		}
+		if (choice != 1 && choice != 2 && choice != 3 && choice != 0)
+		{
+			std::cout << "invalid choice, please try again\n";
+			continue;
+		}
+		while (true)
+		{
+			std::string expression;
+			std::cout << "Enter expression (or '0' to return to menu): ";
+			std::getline(std::cin, expression);
 
+			if (expression == "0") {
+				std::cout << "Returning to menu...\n";
+				break;
+			}
+			if (choice == 1)
+			{
+				int result = realCalc.solve(expression);
+				if (result != std::numeric_limits<int>::max())
+				{
+					std::cout << expression << " = " << result << "\n";
+				}
 
-
+			}
+			else if (choice == 2)
+			{
+				float result = fractuionCalc.solve(expression);
+				if (result != std::numeric_limits<float>::max())
+				{
+					std::cout << expression << " = " << result << "\n";
+				}
+			}
+			else if (choice == 3)
+			{
+				std::complex<float> result = complexCalc.solve(expression);
+				if (result != std::numeric_limits<std::complex<float>>::max())
+				{
+					std::cout << expression << " = " << result<< "\n";
+				}
+			}
+		}
+	}
 	return 0;
 }
