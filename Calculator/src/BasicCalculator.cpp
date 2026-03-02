@@ -24,16 +24,16 @@ template <class T>
 BasicCalculator<T>::~BasicCalculator() = default;
 
 template <class T>
-T BasicCalculator<T>::add(T& a, T& b) { return a + b; }
+T BasicCalculator<T>::add(T a, T b) { return a + b; }
 
 template <class T>
-T BasicCalculator<T>::sub(T& a, T& b) { return a - b; }
+T BasicCalculator<T>::sub(T a, T b) { return a - b; }
 
 template <class T>
-T BasicCalculator<T>::mul(T& a, T& b) { return a * b; }
+T BasicCalculator<T>::mul(T a, T b) { return a * b; }
 
 template <class T>
-T BasicCalculator<T>::div(T& a, T& b) { 
+T BasicCalculator<T>::div(T a, T b) { 
 	if (b == T(0)) {
 		std::cout <<"Error: Division by zero\n";
 		return {};
@@ -58,15 +58,15 @@ T BasicCalculator<T>::applyOp(std::vector<T>& values, char op)
 	T a = values.back(); values.pop_back();
 
 	static std::map<char, std::function<T(T&, T&)>> opMap = {
-		{'+', [this](T& x, T& y) { return add(x, y); }},
-		{'-', [this](T& x, T& y) { return sub(x, y); }},
-		{'*', [this](T& x, T& y) { return mul(x, y); }},
-		{'/', [this](T& x, T& y) { return div(x, y); }}
+		{'+', [this](T x, T y) { return add(x, y); }},
+		{'-', [this](T x, T y) { return sub(x, y); }},
+		{'*', [this](T x, T y) { return mul(x, y); }},
+		{'/', [this](T x, T y) { return div(x, y); }}
 	};
 
-	auto operation = opMap.find(op);
-	if (operation != opMap.end()) {
-		T res = operation->second(a, b);
+	auto iterator = opMap.find(op);
+	if (iterator != opMap.end()) {
+		T res = iterator->second(a, b);
 		values.push_back(res);
 		return res;
 	} else {

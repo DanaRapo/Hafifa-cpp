@@ -41,10 +41,10 @@ protected:
 
 	bool isLegalOperaotor(char op) const;
 	void addLegalOperator(char op);
-	T add(T& a, T& b);
-	T sub(T& a, T& b);
-	T mul(T& a, T& b);
-	T div(T& a, T& b);
+	T add(T a, T b);
+	T sub(T a, T b);
+	T mul(T a, T b);
+	T div(T a, T b);
 
 private:
 	std::vector<char> legalOperators_;
