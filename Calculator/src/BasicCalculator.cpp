@@ -35,8 +35,7 @@ T BasicCalculator<T>::mul(T a, T b) { return a * b; }
 template <class T>
 T BasicCalculator<T>::div(T a, T b) { 
 	if (b == T(0)) {
-		std::cout <<"Error: Division by zero\n";
-		return {};
+		throw std::runtime_error("Division by zero");
 	}
 	return a / b; 
 }
@@ -45,13 +44,11 @@ template <class T>
 T BasicCalculator<T>::applyOp(std::vector<T>& values, char op)
 {
 	if (!isLegalOperaotor(op)) {
-		std::cout <<"Error: Illegal operator '" << op << "'\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Illegal operator '") + op + "'");
 	}
 	if (values.size() < 2)
 	{
-		std::cout << "Error: Not enough operands for operator '" << op << "'\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Not enough operands for operator '") + op + "'");
 	}
 
 	T b = values.back(); values.pop_back();
@@ -70,8 +67,7 @@ T BasicCalculator<T>::applyOp(std::vector<T>& values, char op)
 		values.push_back(res);
 		return res;
 	} else {
-		std::cout << "Error: Operator '" << op << "' not implemented\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Operator '") + op + "' not implemented");
 	}
 }
 
@@ -80,13 +76,11 @@ T BasicCalculator<T>::strToValue(const std::string& exp, int& pos)
 {
 	if (!std::is_same_v<T, int>)
 	{
-		std::cout << "Error: expecting only integer\n";
-		return std::numeric_limits<T>::max();
+        throw std::runtime_error(std::string("Error: expecting only integer"));
 	}
 	if (pos >= (int)exp.size())
 	{
-		std::cout << "Error: index out of range\n";
-		return std::numeric_limits<T>::max();
+		throw std::out_of_range(std::string("Error: index out of range"));
 	}
 	bool negative = false;
 	int startPos = pos;
@@ -109,8 +103,7 @@ T BasicCalculator<T>::strToValue(const std::string& exp, int& pos)
 	// Check for invalid characters after the number
 	if (pos < exp.size() && (exp[pos] == '.' || exp[pos] == 'i'))
 	{
-		std::cout << "Error: expecting only integer\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Error: expecting only integer"));
 	}
 	T rawValue = static_cast<T>(std::stoi(exp.substr(startPos, pos - startPos)));
 	rawValue = negative ? -rawValue : rawValue;
@@ -160,9 +153,8 @@ T BasicCalculator<T>::solve(const std::string& expression)
             }
             else
             {
-                std::cout << "Error: Expected number but found '"
-                    << expression[index] << "'\n";
-                return std::numeric_limits<T>::max();
+				throw std::runtime_error(std::string("Error: Expected number but found '")
+                    + expression[index] + "'");
             }
         }
         else
@@ -180,8 +172,7 @@ T BasicCalculator<T>::solve(const std::string& expression)
 
                 if (operators.empty())
                 {
-                    std::cout << "Error: Mismatched parentheses\n";
-                    return std::numeric_limits<T>::max();
+					throw std::runtime_error("Error: Mismatched parentheses");
                 }
 
                 operators.pop_back(); // remove '('
@@ -215,9 +206,9 @@ T BasicCalculator<T>::solve(const std::string& expression)
             }
             else
             {
-                std::cout << "Error: Illegal character '"
-                    << op << "'\n";
-                return std::numeric_limits<T>::max();
+				throw std::runtime_error(std::string
+                ("Error: Illegal character '")+ op + "'");
+
             }
         }
     }
@@ -227,8 +218,7 @@ T BasicCalculator<T>::solve(const std::string& expression)
     {
         if (operators.back() == '(')
         {
-            std::cout << "Error: Mismatched parentheses\n";
-            return std::numeric_limits<T>::max();
+			throw std::runtime_error("Error: Mismatched parentheses");
         }
 
         applyOp(values, operators.back());
@@ -237,13 +227,88 @@ T BasicCalculator<T>::solve(const std::string& expression)
 
     if (values.size() != 1)
     {
-        std::cout << "Error: Invalid expression\n";
-        return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Error: Invalid expression"));
     }
-
     return values.back();
 }
 
+template <class T>
+void BasicCalculator<T>::printFileContent(const std::string& path) const
+{
+	std::ifstream file(path);
+    if (!file.is_open()) {
+		throw std::runtime_error(std::string
+        ("Error: Could not open file '") + path + "'");
+	}
+    std::string line;
+    while (std::getline(file, line)) {
+        std::cout << line << "\n";
+	}
+}
+
+template<class T>
+void BasicCalculator<T>::printAndSolveFile(const std::string& path)
+{
+    std::ifstream file(path);
+    if (!file.is_open()) {
+		throw std::runtime_error(std::string
+        ("Error: Could not open file '") + path + "'");
+    }
+    //transform the file content into a single string, then split it by \n to get each expression
+    std::stringstream contentBuf;
+    contentBuf << file.rdbuf();
+    std::string fileContent = contentBuf.str();
+    std::regex seperator("\\\\n");
+    std::sregex_token_iterator expression(fileContent.begin(), fileContent.end(), seperator, -1);
+    std::sregex_token_iterator end;
+    while (expression != end)
+    {
+        std::string exp = *expression;
+        try {
+            T result = solve(exp);
+            std::cout << exp << " = " << result << "\n";
+        }
+        catch (const std::exception& e) {
+            std::cout << exp << " = Error (" << e.what() << ")\n";
+        }
+        ++expression;
+    }
+}
+template <class T>
+void BasicCalculator<T>::solveFileAndAppend(const std::string& inputPath, const std::string& outputPath)
+{
+	std::ifstream inputFile(inputPath);
+    if (!inputFile.is_open()) {
+        throw std::runtime_error(std::string
+        ("Error: Could not open file '") + inputPath + "'");
+    }
+    std::ofstream outputFile(outputPath, std::ios::app);
+    if (!outputFile.is_open()) {
+        throw std::runtime_error(std::string
+        ("Error: Could not open file '") + outputPath + "'");
+    }
+    //transform the file content into a single string, then split it by \n to get each expression
+    std::stringstream contentBuf;
+    contentBuf << inputFile.rdbuf();
+    std::string fileContent = contentBuf.str();
+    std::regex seperator("\\\\n");
+    std::sregex_token_iterator expression(fileContent.begin(), fileContent.end(), seperator, -1);
+    std::sregex_token_iterator end;
+    while (expression != end)
+    {
+        std::string exp = *expression;
+        try {
+            T result = solve(exp);
+            outputFile << exp << " = " << result << "\n";
+        }
+        catch (const std::exception& e) {
+            outputFile << exp << " = Error (" << e.what() << ")\n";
+        }
+        ++expression;
+	}
+    inputFile.close();
+    outputFile.close();
+}
 template class BasicCalculator<int>;
 template class BasicCalculator<float>;
 template class BasicCalculator<std::complex<float>>;

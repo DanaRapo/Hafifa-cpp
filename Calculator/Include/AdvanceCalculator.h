@@ -16,6 +16,19 @@ public:
 	 */
 	T solve(const std::string& expression) override;
 
+	/**
+	* @brief Print the contents of a file and solve each expression in it
+	* @param path The file path to read, solve and print
+	*/
+	void printAndSolveFile(const std::string& path) override;
+
+	/**
+	* @brief solve each expression in a file and append the results to another file
+	* @param path The file path to read and solve
+	* @param outputPath The file path to append the results to
+	*/
+	void solveFileAndAppend(const std::string& inputPath, const std::string& outputPath) override;
+
 protected:
 	/**
 	 * @brief Convert a substring of the expression to a value of type T

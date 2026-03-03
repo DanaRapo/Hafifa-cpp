@@ -7,6 +7,8 @@ int main()
 	BasicCalculator<int> realCalc;
 	AdvanceCalculator<float> fractuionCalc;
 	AdvanceCalculator<std::complex<float>> complexCalc;
+	complexCalc.printAndSolveFile("exeForCalc.txt");
+	complexCalc.solveFileAndAppend("exeForCalc.txt", "answers.txt");
 	while (true)
 	{
 		std::cout << "\nSelect calculator:\n";

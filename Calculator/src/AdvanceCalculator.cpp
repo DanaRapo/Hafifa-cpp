@@ -25,13 +25,11 @@ template <class T>
 T AdvanceCalculator<T>::applyOp(std::vector<T>& values, char op)
 {
 	if (!isLegalOperaotor(op)) {
-		std::cout << "Error: Illegal operator '" << op << "'\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Illegal operator '") + op + "'");
 	}
 	if (op == '#') {
 		if (values.size() < 1) {
-			std::cout << "Error: Not enough operands for sqrt operator\n";
-			return std::numeric_limits<T>::max();
+			throw std::runtime_error("Not enough operands for sqrt operator");
 		}
 		T a = values.back(); values.pop_back();
 		T res = sqrtOp(a);
@@ -39,8 +37,7 @@ T AdvanceCalculator<T>::applyOp(std::vector<T>& values, char op)
 		return res;
 	}
 	if (values.size() < 2) {
-		std::cout << "Error: Not enough operands for power operator\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Not enough operands for operator '") + op + "'");
 	}
 	T b = values.back(); values.pop_back();
 	T a = values.back(); values.pop_back();
@@ -60,8 +57,7 @@ T AdvanceCalculator<T>::applyOp(std::vector<T>& values, char op)
 		return res;
 	}
 	else {
-		std::cout << "Error: Operator '" << op << "' not implemented\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Operator '") + op + "' not implemented");
 	}
 	
 }
@@ -71,8 +67,7 @@ float AdvanceCalculator<float>::strToValue(const std::string& exp, int& pos)
 {
 	if (pos >= (int)exp.size())
 	{
-		std::cout << "Error: index out of range\n";
-		return std::numeric_limits<float>::max();
+		throw std::runtime_error(std::string("Error: index out of range"));
 	}
 
 	bool negative = false;
@@ -97,8 +92,7 @@ float AdvanceCalculator<float>::strToValue(const std::string& exp, int& pos)
 		{
 			if (hasDecimalPoint)
 			{
-				std::cout << "Error: Multiple decimal points in number\n";
-				return std::numeric_limits<float>::max();
+				throw std::runtime_error(std::string("Error: Multiple decimal points in number"));
 			}
 			hasDecimalPoint = true;
 		}
@@ -107,8 +101,7 @@ float AdvanceCalculator<float>::strToValue(const std::string& exp, int& pos)
 	// Check for invalid characters after the number
 	if (pos < exp.size() && (exp[pos] == '.' || exp[pos] == 'i'))
 	{
-		std::cout << "Error: expecting only integer\n";
-		return std::numeric_limits<float>::max();
+		throw std::runtime_error(std::string("Error: expecting only integer"));
 	}
 	float rawValue = static_cast<float>(std::stof(exp.substr(startPos, pos - startPos)));
 	rawValue = negative ? -rawValue : rawValue;
@@ -126,8 +119,7 @@ std::complex<float> AdvanceCalculator<std::complex<float>>::strToValue(const std
 		pos++;
 	if (pos >= (int)exp.size())
 	{
-		std::cout << "Error: index out of range\n";
-		return std::numeric_limits<std::complex<float>>::max();
+		throw std::runtime_error(std::string("Error: index out of range"));
 	}
 
 	// check if the current part is imaginary (ending with 'i') or real
@@ -142,7 +134,6 @@ std::complex<float> AdvanceCalculator<std::complex<float>>::strToValue(const std
 	{
 		pos++;
 	}
-
 	bool hasDecimal = false;
 	while (pos < (int)exp.size() && (std::isdigit(exp[pos]) || exp[pos] == '.'))
 	{
@@ -150,8 +141,8 @@ std::complex<float> AdvanceCalculator<std::complex<float>>::strToValue(const std
 		{
 			if (hasDecimal)
 			{
-				std::cout << "Error: multiple decimal points in number\n";
-				return std::numeric_limits<std::complex<float>>::max();
+				throw std::runtime_error(std::string
+				("Error: multiple decimal points in number"));
 			}
 			hasDecimal = true;
 		}
@@ -178,8 +169,7 @@ std::complex<float> AdvanceCalculator<std::complex<float>>::strToValue(const std
 		// pure real
 		if (numberPart.empty())
 		{
-			std::cout << "Error: expecting number\n";
-			return std::numeric_limits<std::complex<float>>::max();
+			throw std::runtime_error(std::string("Error: expecting number"));
 		}
 		realPart = std::stof(numberPart);
 		return std::complex<float>(realPart, 0.0f);
@@ -229,8 +219,8 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 				T value = strToValue(expression, startIndex);
 				if (startIndex == index)  
 				{
-					std::cout << "Error: Invalid number at position " << index << "\n";
-					return std::numeric_limits<T>::max();
+					throw std::runtime_error(std::string
+					("Error: expecting number at position ") + std::to_string(index));
 				}
 				values.push_back(value);
 				index = startIndex;
@@ -251,9 +241,8 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 			//if there are two operators one after the other without a number in between, it's an error
 			else
 			{
-				std::cout << "Error: Expected number but found '"
-					<< expression[index] << "'\n";
-				return std::numeric_limits<T>::max();
+				throw std::runtime_error(std::string
+				("Error: expecting number but found '") + expression[index] + "'");
 			}
 		}
 		//expecting an operator
@@ -267,16 +256,11 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 				{
 					T calcVal = applyOp(values, operators.back());
 					operators.pop_back();
-					if (calcVal == std::numeric_limits<T>::max())
-					{
-						return std::numeric_limits<T>::max();
-					}
 				}
 				//missing (
 				if (operators.empty())
 				{
-					std::cout << "Error: Mismatched parentheses\n";
-					return std::numeric_limits<T>::max();
+					throw std::runtime_error(std::string("Error: Mismatched parentheses"));
 				}
 				operators.pop_back(); // remove '('
 				index++;
@@ -297,15 +281,11 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 					{
 						T calcVal = applyOp(values, topOp);
 						operators.pop_back();
-						if (calcVal == std::numeric_limits<T>::max())
-							return std::numeric_limits<T>::max();
 					}
 					else if (rightAssoc[op] && topPrecedence > currentPrecedence)
 					{
 						T calcVal = applyOp(values, topOp);
 						operators.pop_back();
-						if (calcVal == std::numeric_limits<T>::max())
-							return std::numeric_limits<T>::max();
 					}
 					else break;
 				}
@@ -316,20 +296,18 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 			//if the operator is not legal, it's an error
 			else
 			{
-				std::cout << "Error: Illegal character '"
-					<< op << "'\n";
-				index++; // move past illegal character to avoid infinite loop
+				throw std::runtime_error(std::string
+				("Error: Illegal character '") + op + "'");
+				//index++; // move past illegal character to avoid infinite loop
 			}
 		}
 	}
-
 	//apply the remaining operators in the stack
 	while (!operators.empty())
 	{
 		if (operators.back() == '(')
 		{
-			std::cout << "Error: Mismatched parentheses\n";
-			return std::numeric_limits<T>::max();
+			throw std::runtime_error(std::string("Error: Mismatched parentheses"));
 		}
 		T calcVal = applyOp(values, operators.back());
 		operators.pop_back();
@@ -338,14 +316,76 @@ T AdvanceCalculator<T>::solve(const std::string& expression)
 			return std::numeric_limits<T>::max();
 		}
 	}
-
 	if (values.size() != 1)
 	{
-		std::cout << "Error: Invalid expression\n";
-		return std::numeric_limits<T>::max();
+		throw std::runtime_error(std::string("Error: Invalid expression"));
 	}
 	return values.back();
 }
 
+template<class T>
+void AdvanceCalculator<T>::printAndSolveFile(const std::string& path)
+{
+	std::ifstream file(path);
+	if (!file.is_open()) {
+		throw std::runtime_error(std::string
+		("Error: Could not open file '") + path + "'");
+	}
+	//transform the file content into a single string, then split it by \n to get each expression
+	std::stringstream contentBuf;
+	contentBuf << file.rdbuf();
+	std::string fileContent = contentBuf.str();
+	std::regex seperator("\\\\n");
+	std::sregex_token_iterator expression(fileContent.begin(), fileContent.end(), seperator, -1);
+	std::sregex_token_iterator end;
+	while (expression != end)
+	{
+		std::string exp = *expression;
+		try {
+			T result = solve(exp);
+			std::cout << exp << " = " << result << "\n";
+		}
+		catch (const std::exception& e) {
+			std::cout << exp << " = Error (" << e.what() << ")\n";
+		}
+		++expression;
+	}
+}
+
+template <class T>
+void AdvanceCalculator<T>::solveFileAndAppend(const std::string& inputPath, const std::string& outputPath)
+{
+	std::ifstream inputFile(inputPath);
+	if (!inputFile.is_open()) {
+		throw std::runtime_error(std::string
+		("Error: Could not open file '") + inputPath + "'");
+	}
+	std::ofstream outputFile(outputPath, std::ios::app);
+	if (!outputFile.is_open()) {
+		throw std::runtime_error(std::string
+		("Error: Could not open file '") + outputPath + "'");
+	}
+	//transform the file content into a single string, then split it by \n to get each expression
+	std::stringstream contentBuf;
+	contentBuf << inputFile.rdbuf();
+	std::string fileContent = contentBuf.str();
+	std::regex seperator("\\\\n");
+	std::sregex_token_iterator expression(fileContent.begin(), fileContent.end(), seperator, -1);
+	std::sregex_token_iterator end;
+	while (expression != end)
+	{
+		std::string exp = *expression;
+		try {
+			T result = solve(exp);
+			outputFile << exp << " = " << result << "\n";
+		}
+		catch (const std::exception& e) {
+			outputFile << exp << " = Error (" << e.what() << ")\n";
+		}
+		++expression;
+	}
+	inputFile.close();
+	outputFile.close();
+}
 template class AdvanceCalculator<float>;
 template class AdvanceCalculator<std::complex<float>>;
