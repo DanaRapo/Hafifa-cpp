@@ -46,6 +46,12 @@ public:
 
 protected:
 	/**
+	* @brief Print or write to a file the contents of an input file and solve each expression in it
+	* @param path The file path to read, solve and print
+	* @param output The output stream to write the results to (e.g., std::cout or an ofstream)
+	*/
+	virtual void fileHendeler(const std::string& path, std::ostream& output);
+	/**
 	 * @brief Convert a substring of the expression to a value of type T
 	 * @param exp The full expression string
 	 * @param pos Current index in string (updated after parsing)

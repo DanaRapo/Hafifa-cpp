@@ -245,13 +245,12 @@ void BasicCalculator<T>::printFileContent(const std::string& path) const
         std::cout << line << "\n";
 	}
 }
-
-template<class T>
-void BasicCalculator<T>::printAndSolveFile(const std::string& path)
+template <class T>
+void BasicCalculator<T>::fileHendeler(const std::string& path, std::ostream& output)
 {
     std::ifstream file(path);
     if (!file.is_open()) {
-		throw std::runtime_error(std::string
+        throw std::runtime_error(std::string
         ("Error: Could not open file '") + path + "'");
     }
     //transform the file content into a single string, then split it by \n to get each expression
@@ -266,47 +265,31 @@ void BasicCalculator<T>::printAndSolveFile(const std::string& path)
         std::string exp = *expression;
         try {
             T result = solve(exp);
-            std::cout << exp << " = " << result << "\n";
+            output << exp << " = " << result << "\n";
         }
         catch (const std::exception& e) {
-            std::cout << exp << " = Error (" << e.what() << ")\n";
+            output << exp << " = Error (" << e.what() << ")\n";
         }
         ++expression;
     }
+    file.close();
 }
+
+template<class T>
+void BasicCalculator<T>::printAndSolveFile(const std::string& path)
+{
+	fileHendeler(path, std::cout);
+}
+
 template <class T>
 void BasicCalculator<T>::solveFileAndAppend(const std::string& inputPath, const std::string& outputPath)
 {
-	std::ifstream inputFile(inputPath);
-    if (!inputFile.is_open()) {
-        throw std::runtime_error(std::string
-        ("Error: Could not open file '") + inputPath + "'");
-    }
     std::ofstream outputFile(outputPath, std::ios::app);
     if (!outputFile.is_open()) {
         throw std::runtime_error(std::string
         ("Error: Could not open file '") + outputPath + "'");
     }
-    //transform the file content into a single string, then split it by \n to get each expression
-    std::stringstream contentBuf;
-    contentBuf << inputFile.rdbuf();
-    std::string fileContent = contentBuf.str();
-    std::regex seperator("\\\\n");
-    std::sregex_token_iterator expression(fileContent.begin(), fileContent.end(), seperator, -1);
-    std::sregex_token_iterator end;
-    while (expression != end)
-    {
-        std::string exp = *expression;
-        try {
-            T result = solve(exp);
-            outputFile << exp << " = " << result << "\n";
-        }
-        catch (const std::exception& e) {
-            outputFile << exp << " = Error (" << e.what() << ")\n";
-        }
-        ++expression;
-	}
-    inputFile.close();
+	fileHendeler(inputPath, outputFile);
     outputFile.close();
 }
 template class BasicCalculator<int>;
