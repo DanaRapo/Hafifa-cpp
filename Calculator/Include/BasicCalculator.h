@@ -51,6 +51,7 @@ protected:
 	* @param output The output stream to write the results to (e.g., std::cout or an ofstream)
 	*/
 	virtual void fileHendeler(const std::string& path, std::ostream& output);
+
 	/**
 	 * @brief Convert a substring of the expression to a value of type T
 	 * @param exp The full expression string
